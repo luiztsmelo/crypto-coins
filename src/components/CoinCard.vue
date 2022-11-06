@@ -23,6 +23,7 @@ const coinPriceFormatted = computed(() => {
 async function animatePrice () {
   const priceElements = document.querySelectorAll('#price')
 
+  // @ts-ignore
   for (const priceElement of priceElements) {
     // @ts-expect-error: Lib bad behavior
     const { tweenable } = tween({
@@ -48,9 +49,7 @@ watchEffect(() => {
 
     console.log(coinPrice.value)
 
-    setTimeout(() => {
-      animatePrice()
-    }, 150)
+    setTimeout(() => animatePrice(), 150)
   }
 })
 </script>
