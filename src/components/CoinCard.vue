@@ -27,6 +27,7 @@ async function animatePrice () {
     // @ts-expect-error: Lib bad behavior
     const { tweenable } = tween({
       render: ({ color }) => {
+        // @ts-ignore
         priceElement.style.color = color
       },
       easing: 'easeInQuart',
@@ -42,6 +43,7 @@ async function animatePrice () {
 
 watchEffect(() => {
   if (coinStore.coinsPrices) {
+    // @ts-ignore
     coinPrice.value = coinStore.coinsPrices[props.coin.id].usd
 
     console.log(coinPrice.value)

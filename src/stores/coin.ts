@@ -26,6 +26,7 @@ export const useCoinStore = defineStore('coin', () => {
 
       for (const res of promisesRes) {
         const data = await res.json()
+        // @ts-ignore
         coinsData.push(data)
       }
 
@@ -69,7 +70,8 @@ export const useCoinStore = defineStore('coin', () => {
       for (const res of promisesRes) {
         const data = await res.json()
 
-        coinsPrices.value[data.id].usd = data.market_data.current_price.usd
+        // @ts-ignore
+        if (coinsPrices.value) coinsPrices.value[data.id].usd = data.market_data.current_price.usd
       }
     } catch (error) {
       console.error(error)
