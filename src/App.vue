@@ -9,6 +9,3 @@ header(class="flex items-center justify-center my-12")
 main
   RouterView
 </template>
-
-<style scoped>
-</style>

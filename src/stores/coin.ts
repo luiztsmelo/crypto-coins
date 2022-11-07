@@ -3,6 +3,8 @@ import { defineStore } from 'pinia'
 import dayjs from 'dayjs'
 
 export const useCoinStore = defineStore('coin', () => {
+  const coinsList = ['bitcoin', 'dacxi', 'ethereum', 'cosmos', 'terra-luna-2']
+
   const coinsData = reactive([])
   const coinsPrices = ref(null)
 
@@ -19,7 +21,9 @@ export const useCoinStore = defineStore('coin', () => {
       const promises = []
 
       for (const coinId of coins) {
-        promises.push(fetch(`https://api.coingecko.com/api/v3/coins/${coinId}`, { method: 'GET' }))
+        promises.push(fetch(`https://api.coingecko.com/api/v3/coins/${coinId}`, {
+          method: 'GET'
+        }))
       }
 
       const promisesRes = await Promise.all(promises)
@@ -29,8 +33,6 @@ export const useCoinStore = defineStore('coin', () => {
         // @ts-ignore
         coinsData.push(data)
       }
-
-      console.log(coinsData)
     } catch (error) {
       console.error(error)
     } finally {
@@ -40,14 +42,15 @@ export const useCoinStore = defineStore('coin', () => {
 
   async function getCoinsPrices (coins: string[]) {
     try {
-      const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coins.join(',')}&vs_currencies=usd&precision=full`, {
+      const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coins.join(',')}&vs_currencies=usd&precision=full&include_24hr_change=true`, {
         method: 'GET',
-        cache: 'no-cache'
+        cache: 'no-cache',
+        headers: {
+          'cache-control': 'no-cache'
+        }
       })
 
       const data = await response.json()
-
-      console.log(data)
 
       coinsPrices.value = data
     } catch (error) {
@@ -62,7 +65,10 @@ export const useCoinStore = defineStore('coin', () => {
       const dateFormatted = dayjs(date.value).format('DD-MM-YYYY')
 
       for (const coinId of coins) {
-        promises.push(fetch(`https://api.coingecko.com/api/v3/coins/${coinId}/history?date=${dateFormatted}`, { method: 'GET' }))
+        promises.push(fetch(`https://api.coingecko.com/api/v3/coins/${coinId}/history?date=${dateFormatted}`, {
+          method: 'GET',
+          cache: 'no-cache'
+        }))
       }
 
       const promisesRes = await Promise.all(promises)
@@ -70,8 +76,10 @@ export const useCoinStore = defineStore('coin', () => {
       for (const res of promisesRes) {
         const data = await res.json()
 
-        // @ts-ignore
-        if (coinsPrices.value) coinsPrices.value[data.id].usd = data.market_data.current_price.usd
+        if (coinsPrices.value) {
+          // @ts-ignore
+          coinsPrices.value[data.id].usd = data.market_data !== undefined ? data.market_data.current_price.usd : 0
+        }
       }
     } catch (error) {
       console.error(error)
@@ -79,6 +87,7 @@ export const useCoinStore = defineStore('coin', () => {
   }
 
   return {
+    coinsList,
     coinsData,
     coinsPrices,
     date,
